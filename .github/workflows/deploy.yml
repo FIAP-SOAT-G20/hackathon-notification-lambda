@@ -1,0 +1,59 @@
+name: Deploy Notification Lambda
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "infra/**"
+      - ".github/workflows/deploy.yml"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_notification_queue_arn: ${{ secrets.TF_VAR_notification_queue_arn }}
+      TF_VAR_mailtrap_user: ${{ secrets.TF_VAR_mailtrap_user }}
+      TF_VAR_mailtrap_pass: ${{ secrets.TF_VAR_mailtrap_pass }}
+      TF_VAR_from_email: ${{ secrets.TF_VAR_from_email }}
+      TF_VAR_subject_prefix: ${{ secrets.TF_VAR_subject_prefix }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: infra
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
+            -backend-config="key=${{ secrets.TF_BACKEND_KEY }}" \
+            -backend-config="region=${{ secrets.TF_BACKEND_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_BACKEND_LOCK_TABLE }}" \
+            -backend-config="encrypt=true"
+
+      - name: Terraform Format & Validate
+        working-directory: infra
+        run: |
+          terraform fmt -recursive
+          terraform validate
+
+      - name: Terraform Plan
+        working-directory: infra
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: infra
+        run: terraform apply -auto-approve
