@@ -9,6 +9,9 @@
 *.dylib
 
 .ideia/
+.ideia/*
+.ideia/**/*
+.ideia
 
 
 # Test binary, built with `go test -c`
