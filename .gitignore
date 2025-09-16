@@ -8,10 +8,10 @@
 *.so
 *.dylib
 
-.ideia/
-.ideia/*
-.ideia/**/*
-.ideia
+.idea/
+.idea/*
+.idea/**/*
+.idea
 
 
 # Test binary, built with `go test -c`
