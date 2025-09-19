@@ -16,24 +16,8 @@ provider "aws" {
   region = var.aws_region
 }
 
-# IAM Role
-data "aws_iam_policy_document" "lambda_assume" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "lambda_exec" {
-  name               = "${var.project}-notification-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_basic_logs" {
-  role       = aws_iam_role.lambda_exec.name
+  role       = "LabRole"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
@@ -56,37 +40,37 @@ resource "aws_iam_policy" "lambda_sqs_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs_attach" {
-  role       = aws_iam_role.lambda_exec.name
+  role       = "LabRole"
   policy_arn = aws_iam_policy.lambda_sqs_policy.arn
 }
 
-# Empacotar código
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda"
+  source_dir  = "${path.module}/"
   output_path = "${path.module}/build/notification_lambda.zip"
 }
 
-# Lambda
 resource "aws_lambda_function" "notification" {
   function_name = "${var.project}-notification-lambda"
-  role          = aws_iam_role.lambda_exec.arn
+  role          = var.lab_role_arn
   handler       = "main.lambda_handler"
   runtime       = "python3.11"
   filename      = data.archive_file.lambda_zip.output_path
   timeout       = 30
   memory_size   = 256
+
   environment {
     variables = {
-      MAILTRAP_USER  = var.mailtrap_user
-      MAILTRAP_PASS  = var.mailtrap_pass
-      FROM_EMAIL     = var.from_email
-      USER_SERVICE_ENDPOINT = var.user_service_endpoint
-      MAILTRAP_HOST  = var.mailtrap_host
-      MAILTRAP_PORT  = tostring(var.mailtrap_port)
+      MAILTRAP_USER          = var.mailtrap_user
+      MAILTRAP_PASS          = var.mailtrap_pass
+      FROM_EMAIL             = var.from_email
+      USER_SERVICE_ENDPOINT  = var.user_service_endpoint
+      MAILTRAP_HOST          = var.mailtrap_host
+      MAILTRAP_PORT          = tostring(var.mailtrap_port)
     }
   }
 }
+
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.notification.function_name}"

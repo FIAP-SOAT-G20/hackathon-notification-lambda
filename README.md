@@ -103,7 +103,7 @@ Example of payload the Lambda will receive:
 {
   "Records": [
     {
-      "body": "{\"email\":\"user@example.com\",\"video_id\":\"12345\",\"status\":\"PROCESSED\",\"download_url\":\"https://example.com/video/12345\"}"
+      "body": "{\"user_id\":42,\"video_id\":\"12345\",\"status\":\"FINISHED\",\"occurred_at\":\"20250918\"}"
     }
   ]
 }

@@ -13,12 +13,14 @@ jobs:
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_lab_role_arn: ${{ secrets.LAB_ROLE_ARN }}
       TF_VAR_notification_queue_arn: ${{ secrets.TF_VAR_notification_queue_arn }}
       TF_VAR_mailtrap_host: ${{ secrets.TF_VAR_mailtrap_host }}
       TF_VAR_mailtrap_user: ${{ secrets.TF_VAR_mailtrap_user }}
       TF_VAR_mailtrap_pass: ${{ secrets.TF_VAR_mailtrap_pass }}
       TF_VAR_from_email: ${{ secrets.TF_VAR_from_email }}
       TF_VAR_user_service_endpoint: ${{ secrets.TF_VAR_user_service_endpoint }}
+
 
     steps:
       - name: Checkout
