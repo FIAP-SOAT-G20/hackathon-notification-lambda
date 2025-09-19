@@ -10,7 +10,7 @@ variable "project" {
 
 variable "notification_queue_arn" {
   type        = string
-  description = "ARN da fila SQS já existente"
+  description = "ARN of the existing SQS queue"
 }
 
 variable "mailtrap_user" {
@@ -28,9 +28,9 @@ variable "from_email" {
   default     = "no-reply@example.com"
 }
 
-variable "subject_prefix" {
+variable "user_service_endpoint" {
   type        = string
-  default     = "[Video Service] "
+  default     = "http://localhost:8080/api/v1/users"
 }
 
 variable "mailtrap_host" {
@@ -40,5 +40,5 @@ variable "mailtrap_host" {
 
 variable "mailtrap_port" {
   type        = number
-  default     = 587
+  default     = 2525
 }

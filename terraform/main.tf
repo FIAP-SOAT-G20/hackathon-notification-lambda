@@ -71,7 +71,7 @@ data "archive_file" "lambda_zip" {
 resource "aws_lambda_function" "notification" {
   function_name = "${var.project}-notification-lambda"
   role          = aws_iam_role.lambda_exec.arn
-  handler       = "lambda_function.lambda_handler"
+  handler       = "main.lambda_handler"
   runtime       = "python3.11"
   filename      = data.archive_file.lambda_zip.output_path
   timeout       = 30
@@ -81,7 +81,7 @@ resource "aws_lambda_function" "notification" {
       MAILTRAP_USER  = var.mailtrap_user
       MAILTRAP_PASS  = var.mailtrap_pass
       FROM_EMAIL     = var.from_email
-      SUBJECT_PREFIX = var.subject_prefix
+      USER_SERVICE_ENDPOINT = var.user_service_endpoint
       MAILTRAP_HOST  = var.mailtrap_host
       MAILTRAP_PORT  = tostring(var.mailtrap_port)
     }

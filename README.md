@@ -1,106 +1,105 @@
 # Hackathon Notification Lambda
 
-Lambda responsável por enviar **emails de notificação** quando vídeos são processados.
-As mensagens chegam via **SQS Notification Queue** e são entregues aos usuários via **Mailtrap (SMTP)**.
+Lambda responsible for sending **notification emails** when videos are processed.  
+Messages arrive via **SQS Notification Queue** and are delivered to users through **Mailtrap (SMTP)**.
 
 ---
 
-## 📂 Estrutura do Repositório
+## 📂 Repository Structure
 
 ```
 hackathon-notification-lambda/
-   infra/
+   terraform/
       main.tf
       variables.tf
       outputs.tf
-      lambda/
-         lambda_function.py
    .github/
       workflows/
          deploy.yml
+   main.py
    README.md
+   requirements.txt
 ```
 
+---
+
+## ⚙️ Lambda Flow
+
+1. Messages are published in the **notification queue** (SQS).  
+2. The Lambda is triggered automatically.  
+3. The code processes the message, builds the email, and sends it via **Mailtrap SMTP**.
 
 ---
 
-## ⚙️ Fluxo da Lambda
+## 📌 Technologies
 
-1. Mensagens são publicadas na **notification queue** (SQS).
-2. A Lambda é disparada automaticamente.
-3. O código processa a mensagem, monta o email e envia via **Mailtrap SMTP**.
-
----
-
-## 📌 Tecnologias
-
-- **AWS Lambda** (execução do código Python)
-- **AWS SQS** (fila já existente, apenas consumida)
-- **Terraform** (infraestrutura como código)
-- **GitHub Actions** (CI/CD para deploy automático)
-- **Mailtrap** (entrega de email em ambiente de teste)
+- **AWS Lambda** (Python code execution)  
+- **AWS SQS** (existing queue, only consumed)  
+- **Terraform** (infrastructure as code)  
+- **GitHub Actions** (CI/CD for automatic deployment)  
+- **Mailtrap** (email delivery in a testing environment)  
 
 ---
 
-## 🚀 Deploy Automatizado (GitHub Actions)
+## 🚀 Automated Deployment (GitHub Actions)
 
-O deploy é feito automaticamente sempre que houver commit na branch `main`.
-O workflow está em `.github/workflows/deploy.yml`.
+The deployment is done automatically whenever there is a commit to the `main` branch.  
+The workflow is in `.github/workflows/deploy.yml`.
 
-### 🔑 Secrets necessários no GitHub
+### 🔑 Required GitHub Secrets
 
-Adicione os seguintes secrets no repositório:
+Add the following secrets to the repository:
 
-| Secret                          | Descrição                                               |
-|---------------------------------|---------------------------------------------------------|
-| `AWS_ACCESS_KEY_ID`             | Chave de acesso da AWS                                  |
-| `AWS_SECRET_ACCESS_KEY`         | Secret da chave de acesso                               |
-| `AWS_REGION`                    | Região AWS (ex.: `us-east-1`)                           |
-| `TF_BACKEND_BUCKET`             | Nome do bucket S3 para state do Terraform               |
-| `TF_BACKEND_KEY`                | Caminho do arquivo de state no bucket                   |
-| `TF_BACKEND_REGION`             | Região do bucket S3                                     |
-| `TF_BACKEND_LOCK_TABLE`         | Tabela DynamoDB para lock do state                      |
-| `TF_VAR_notification_queue_arn` | ARN da SQS de notificação (fornecida pela outra equipe) |
-| `TF_VAR_mailtrap_user`          | Usuário SMTP do Mailtrap                                |
-| `TF_VAR_mailtrap_pass`          | Senha SMTP do Mailtrap                                  |
-| `TF_VAR_from_email`             | Email remetente (ex.: `no-reply@example.com`)           |
-| `TF_VAR_subject_prefix`         | Prefixo do assunto dos emails (ex.: `[Video Service] `) |
+| Secret                          | Description                                                    |
+|---------------------------------|----------------------------------------------------------------|
+| `AWS_ACCESS_KEY_ID`             | AWS access key                                                 |
+| `AWS_SECRET_ACCESS_KEY`         | AWS access key secret                                          |
+| `AWS_REGION`                    | AWS region (e.g.: `us-east-1`)                                 |
+| `TF_BACKEND_BUCKET`             | S3 bucket name for Terraform state                             |
+| `TF_BACKEND_KEY`                | Path of the state file in the bucket                           |
+| `TF_BACKEND_REGION`             | S3 bucket region                                               |
+| `TF_BACKEND_LOCK_TABLE`         | DynamoDB table for state lock                                  |
+| `TF_VAR_notification_queue_arn` | Notification SQS ARN (provided by the other team)              |
+| `TF_VAR_mailtrap_user`          | Mailtrap SMTP user                                             |
+| `TF_VAR_mailtrap_pass`          | Mailtrap SMTP password                                         |
+| `TF_VAR_from_email`             | Sender email (e.g.: `no-reply@example.com`)                    |
+| `TF_VAR_subject_prefix`         | Email subject prefix (e.g.: `[Video Service] `)                |
 
 ---
 
-## 👨‍💻 Desenvolvimento Local
+## 👨‍💻 Local Development
 
-Se quiser rodar o código localmente para testar:
+If you want to run the code locally for testing:
 
-1. Criar e ativar um venv:
+1. Create and activate a venv:
    ```bash
    python3 -m venv venv
    source venv/bin/activate
-   pip install -r requirements.txt  # (se houver)
-    ```
+   pip install -r requirements.txt  # (if any)
+   ```
 
-2. Criar arquivo .env com variáveis:
+2. Create a .env file with variables:
 
-    ```
-    MAILTRAP_USER=xxxx
-    MAILTRAP_PASS=xxxx
-    FROM_EMAIL=no-reply@example.com
-    SUBJECT_PREFIX=[Video Service]
-    MAILTRAP_HOST=smtp.mailtrap.io
-    MAILTRAP_PORT=587
-    ```
+   ```
+   MAILTRAP_USER=xxxx
+   MAILTRAP_PASS=xxxx
+   FROM_EMAIL=no-reply@example.com
+   SUBJECT_PREFIX=[Video Service]
+   MAILTRAP_HOST=smtp.mailtrap.io
+   MAILTRAP_PORT=587
+   ```
 
-3. Rodar o handler com evento de exemplo:
+3. Run the handler with a sample event:
 
-    ```bash
-    python -m infra.lambda.lambda_function
-    ```
+   ```bash
+   python -m infra.lambda.lambda_function
+   ```
 
-## Evento de Teste (SQS)
+## Test Event (SQS)
 
-Exemplo de payload que a Lambda vai receber:
+Example of payload the Lambda will receive:
 
-````json
+```json
 {
   "Records": [
     {
@@ -108,18 +107,15 @@ Exemplo de payload que a Lambda vai receber:
     }
   ]
 }
+```
 
-````
+## Infrastructure (Terraform)
 
-## Infraestrutura (Terraform)
+Inside the infra/ folder:
 
-Na pasta infra/:
-
-````bash
+```bash
 cd infra
 terraform init
 terraform plan
 terraform apply
-````
-
-
+```
