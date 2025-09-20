@@ -44,6 +44,8 @@ def get_user_email(user_id):
     if response.status_code == 200:
         user_email = response.json()["email"]
         log.info(f"User email is {user_email}")
+    else:
+        log.error(f"Failed to get user email: {response.status_code} - {response.text}")
     return user_email
 
 
