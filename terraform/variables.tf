@@ -39,7 +39,7 @@ variable "mailtrap_host" {
 }
 
 variable "lab_role_arn" {
-  description = "ARN da role LabRole existente"
+  description = "ARN of the existing LabRole"
   type        = string
 }
 
