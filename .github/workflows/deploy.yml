@@ -1,0 +1,65 @@
+name: Deploy Notification Lambda
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "terraform/**"
+      - ".github/workflows/deploy.yml"
+      - "main.py"
+      - "requirements.txt"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_notification_queue_arn: ${{ secrets.AWS_SQS_VIDEO_NOTIFICATION_URL }}
+      TF_VAR_mailtrap_host: ${{ secrets.TF_VAR_mailtrap_host }}
+      TF_VAR_mailtrap_user: ${{ secrets.TF_VAR_mailtrap_user }}
+      TF_VAR_mailtrap_pass: ${{ secrets.TF_VAR_mailtrap_pass }}
+      TF_VAR_from_email: ${{ secrets.TF_VAR_from_email }}
+      TF_VAR_user_service_endpoint: ${{ secrets.AWS_API_GATEWAY_URL }}
+
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Format & Validate
+        working-directory: terraform
+        run: |
+          terraform fmt -recursive
+          terraform validate
+
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: terraform
+        run: terraform apply -auto-approve
