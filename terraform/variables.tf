@@ -38,11 +38,6 @@ variable "mailtrap_host" {
   default     = "smtp.mailtrap.io"
 }
 
-variable "lab_role_arn" {
-  description = "ARN of the existing LabRole"
-  type        = string
-}
-
 variable "mailtrap_port" {
   type        = number
   default     = 2525

@@ -12,13 +12,16 @@ terraform {
   }
 }
 
+data "aws_iam_role" "fiap_lab_role" {
+  name = "LabRole"
+}
+
 provider "aws" {
   region = var.aws_region
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_logs" {
   role       = "LabRole"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 # Permissão para consumir SQS existente
@@ -52,7 +55,7 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "notification" {
   function_name = "${var.project}-notification-lambda"
-  role          = var.lab_role_arn
+  role          = "LabRole"
   handler       = "main.lambda_handler"
   runtime       = "python3.11"
   filename      = data.archive_file.lambda_zip.output_path
