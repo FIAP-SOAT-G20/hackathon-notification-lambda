@@ -6,6 +6,7 @@ on:
     paths:
       - "terraform/**"
       - ".github/workflows/deploy.yml"
+      - "lambda/**"
       - "main.py"
       - "requirements.txt"
 
