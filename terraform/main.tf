@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "lambda_sqs_policy_doc" {
 }
 
 resource "aws_iam_policy" "lambda_sqs_policy" {
-  name   = "${var.project}-lambda-sqs-policy-v2"
+  name   = "${var.project}-lambda-sqs-policy-v3"
   policy = data.aws_iam_policy_document.lambda_sqs_policy_doc.json
 }
 
@@ -46,7 +46,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "notification" {
-  function_name = "${var.project}-notification-lambda-v2"
+  function_name = "${var.project}-notification-lambda-v3"
   role          = data.aws_iam_role.fiap_lab_role.arn
   handler       = "main.lambda_handler"
   runtime       = "python3.12"
@@ -76,6 +76,5 @@ resource "aws_lambda_event_source_mapping" "sqs_to_lambda" {
   event_source_arn                   = var.notification_queue_arn
   function_name                      = aws_lambda_function.notification.arn
   batch_size                         = 5
-  maximum_batching_window_in_seconds = 2
   enabled                            = true
 }
