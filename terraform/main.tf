@@ -46,7 +46,7 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs_attach" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/"
+  source_dir  = "${path.module}/../"
   output_path = "${path.module}/build/notification_lambda.zip"
 }
 

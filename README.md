@@ -92,7 +92,7 @@ If you want to run the code locally for testing:
 3. Run the handler with a sample event:
 
    ```bash
-   python -m infra.lambda.lambda_function
+   python main.py
    ```
 
 ## Test Event (SQS)

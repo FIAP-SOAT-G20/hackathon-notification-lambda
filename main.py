@@ -27,7 +27,7 @@ log.addHandler(handler)
 
 
 MAILTRAP_HOST = os.environ.get("MAILTRAP_HOST", "smtp.mailtrap.io")
-MAILTRAP_PORT = int(os.environ.get("MAILTRAP_PORT", "25"))
+MAILTRAP_PORT = int(os.environ.get("MAILTRAP_PORT", "2525"))
 MAILTRAP_USER = os.environ["MAILTRAP_USER"]
 MAILTRAP_PASS = os.environ["MAILTRAP_PASS"]
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "no-reply@hackathon.com")
