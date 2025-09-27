@@ -20,7 +20,7 @@ jobs:
       TF_VAR_mailtrap_user: ${{ secrets.TF_VAR_mailtrap_user }}
       TF_VAR_mailtrap_pass: ${{ secrets.TF_VAR_mailtrap_pass }}
       TF_VAR_from_email: ${{ secrets.TF_VAR_from_email }}
-      TF_VAR_user_service_endpoint: ${{ secrets.TF_VAR_user_service_endpoint }}
+      TF_VAR_user_service_endpoint: ${{ secrets.AWS_API_GATEWAY_URL }}
 
 
     steps:
