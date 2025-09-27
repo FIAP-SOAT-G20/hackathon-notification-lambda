@@ -12,17 +12,12 @@ terraform {
   }
 }
 
-data "aws_iam_role" "fiap_lab_role" {
-  name = "LabRole"
-}
-
 provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_basic_logs" {
-  role       = "LabRole"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+data "aws_iam_role" "fiap_lab_role" {
+  name = "LabRole"
 }
 
 # Permissão para consumir SQS existente
@@ -44,13 +39,13 @@ resource "aws_iam_policy" "lambda_sqs_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs_attach" {
-  role       = "LabRole"
+  role       = data.aws_iam_role.fiap_lab_role.name
   policy_arn = aws_iam_policy.lambda_sqs_policy.arn
 }
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/../"
+  source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/build/notification_lambda.zip"
 }
 
@@ -58,7 +53,7 @@ resource "aws_lambda_function" "notification" {
   function_name = "${var.project}-notification-lambda"
   role          = data.aws_iam_role.fiap_lab_role.arn
   handler       = "main.lambda_handler"
-  runtime       = "python3.11"
+  runtime       = "python3.12"
   filename      = data.archive_file.lambda_zip.output_path
   timeout       = 30
   memory_size   = 256
@@ -74,7 +69,6 @@ resource "aws_lambda_function" "notification" {
     }
   }
 }
-
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${aws_lambda_function.notification.function_name}"
