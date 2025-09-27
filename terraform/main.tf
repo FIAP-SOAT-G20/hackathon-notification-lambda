@@ -55,7 +55,7 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "notification" {
   function_name = "${var.project}-notification-lambda"
-  role          = "LabRole"
+  role          = data.aws_iam_role.fiap_lab_role.arn
   handler       = "main.lambda_handler"
   runtime       = "python3.11"
   filename      = data.archive_file.lambda_zip.output_path
