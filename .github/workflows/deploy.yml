@@ -47,13 +47,7 @@ jobs:
 
       - name: Terraform Init
         working-directory: terraform
-        run: |
-          terraform init \
-            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
-            -backend-config="key=${{ secrets.TF_BACKEND_KEY }}" \
-            -backend-config="region=${{ secrets.TF_BACKEND_REGION }}" \
-            -backend-config="dynamodb_table=${{ secrets.TF_BACKEND_LOCK_TABLE }}" \
-            -backend-config="encrypt=true"
+        run: terraform init
 
       - name: Terraform Format & Validate
         working-directory: terraform
