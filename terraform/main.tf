@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "lambda_sqs_policy_doc" {
 }
 
 resource "aws_iam_policy" "lambda_sqs_policy" {
-  name   = "${var.project}-lambda-sqs-policy"
+  name   = "${var.project}-lambda-sqs-policy-v2"
   policy = data.aws_iam_policy_document.lambda_sqs_policy_doc.json
 }
 
@@ -46,7 +46,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "notification" {
-  function_name = "${var.project}-notification-lambda-${timestamp()}"
+  function_name = "${var.project}-notification-lambda-v2"
   role          = data.aws_iam_role.fiap_lab_role.arn
   handler       = "main.lambda_handler"
   runtime       = "python3.12"
