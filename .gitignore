@@ -36,3 +36,12 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+package
+
+.terraform/
+terraform.tfstate
+
+tfplan
+
+lambda-deployment-package.zip
