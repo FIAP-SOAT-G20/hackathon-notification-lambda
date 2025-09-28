@@ -79,15 +79,13 @@ def _render_email(payload: dict) -> Tuple[str, str, str]:
 
 
 def lambda_handler(event, context):
-    for record in event.get("Records", []):
-        try:
-            body_raw = record["body"]
-            payload = json.loads(body_raw) if isinstance(body_raw, str) else body_raw
-            log.info(f"message received: {payload}")
+    try:
+        body_raw = event.Message
+        payload = json.loads(body_raw) if isinstance(body_raw, str) else body_raw
+        log.info(f"message received: {payload}")
 
-            to_email, subject, text = _render_email(payload)
-            send_mail(to_email, subject, text)
-            log.info(f"email sent to {to_email} | video_id={payload.get('video_id')}")
-        except Exception as e:
-            log.error(f"Fail to send email, Error: {e}")
-            continue
+        to_email, subject, text = _render_email(payload)
+        send_mail(to_email, subject, text)
+        log.info(f"email sent to {to_email} | video_id={payload.get('video_id')}")
+    except Exception as e:
+        log.error(f"Fail to send email, Error: {e}")
