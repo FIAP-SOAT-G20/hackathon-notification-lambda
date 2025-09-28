@@ -37,7 +37,7 @@ user_service_endpoint = os.environ.get("USER_SERVICE_ENDPOINT")
 
 
 def get_user_email(user_id):
-    url = f"{user_service_endpoint}/api/v1/users/{user_id}"
+    url = f"{user_service_endpoint}/users/{user_id}"
     log.info(f"Getting user email from {url}")
     response = requests.get(url)
     user_email = None

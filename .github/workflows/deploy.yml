@@ -44,6 +44,9 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
 
+      - name: Package Lambda Function with Dependencies
+        run: ./package_lambda.sh
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
