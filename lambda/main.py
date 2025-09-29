@@ -88,7 +88,12 @@ def lambda_handler(event, context):
             
             # Extract and parse the actual message payload from SNS
             if sns_message.get("Type") == "Notification" and "Message" in sns_message:
-                payload = json.loads(sns_message["Message"])
+                try:
+                    payload = json.loads(sns_message["Message"])
+                except json.JSONDecodeError as e:
+                    log.error(f"Failed to parse SNS Message field as JSON: {sns_message['Message']} | Error: {jde}")
+                    continue
+
                 log.info(f"Video status payload: {payload}")
                 
                 to_email, subject, text = _render_email(payload)
