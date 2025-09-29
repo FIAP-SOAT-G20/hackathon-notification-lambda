@@ -79,13 +79,23 @@ def _render_email(payload: dict) -> Tuple[str, str, str]:
 
 
 def lambda_handler(event, context):
-    try:
-        body_raw = event.Message
-        payload = json.loads(body_raw) if isinstance(body_raw, str) else body_raw
-        log.info(f"message received: {payload}")
-
-        to_email, subject, text = _render_email(payload)
-        send_mail(to_email, subject, text)
-        log.info(f"email sent to {to_email} | video_id={payload.get('video_id')}")
-    except Exception as e:
-        log.error(f"Fail to send email, Error: {e}")
+    for record in event.get("Records", []):
+        try:
+            # Parse SQS record body (contains SNS notification)
+            body_raw = record["body"]
+            sns_message = json.loads(body_raw) if isinstance(body_raw, str) else body_raw
+            log.info(f"SNS message received: {sns_message}")
+            
+            # Extract and parse the actual message payload from SNS
+            if sns_message.get("Type") == "Notification" and "Message" in sns_message:
+                payload = json.loads(sns_message["Message"])
+                log.info(f"Video status payload: {payload}")
+                
+                to_email, subject, text = _render_email(payload)
+                send_mail(to_email, subject, text)
+                log.info(f"email sent to {to_email} | video_id={payload.get('video_id')}")
+            else:
+                log.warning(f"Received message is not a valid SNS notification: {sns_message}")
+        except Exception as e:
+            log.error(f"Fail to send email, Error: {e}")
+            continue
