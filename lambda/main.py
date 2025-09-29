@@ -98,4 +98,3 @@ def lambda_handler(event, context):
                 log.warning(f"Received message is not a valid SNS notification: {sns_message}")
         except Exception as e:
             log.error(f"Fail to send email, Error: {e}")
-            continue
