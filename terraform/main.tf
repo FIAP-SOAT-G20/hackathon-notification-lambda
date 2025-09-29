@@ -30,13 +30,13 @@ data "aws_iam_policy_document" "lambda_sqs_policy_doc" {
 }
 
 resource "aws_iam_policy" "lambda_sqs_policy" {
-  name   = "${var.project}-lambda-sqs-policy-v6"
+  name   = "${var.project}-lambda-sqs-policy-v7"
   policy = data.aws_iam_policy_document.lambda_sqs_policy_doc.json
 }
 
 
 resource "aws_lambda_function" "notification" {
-  function_name = "${var.project}-notification-lambda-v6"
+  function_name = "${var.project}-notification-lambda-v7"
   role          = data.aws_iam_role.fiap_lab_role.arn
   handler       = "main.lambda_handler"
   runtime       = "python3.12"
