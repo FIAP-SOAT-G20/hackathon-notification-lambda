@@ -1,5 +1,7 @@
 AWS_EKS_CLUSTER_NAME=hackathon-eks-cluster
 AWS_SQS_NOTIFICATION_ARN=arn:aws:sqs:us-east-1:905417995957:video-status-notification
+MAILTRAP_USER=your_mailtrap_user
+MAILTRAP_PASS=your_mailtrap_pass
 
 # Looks at comments using ## on targets and uses them to produce a help output.
 .PHONY: help
@@ -22,7 +24,7 @@ tf-validate: ## Validate Terraform configuration
 tf-plan: ## Show Terraform plan and save to file
 	@echo  "🟢 Showing Terraform plan..."
 	@echo "Using AWS_SQS_NOTIFICATION_ARN: $(AWS_SQS_NOTIFICATION_ARN)"
-	@cd terraform && terraform plan -out=tfplan -var "notification_queue_arn=$(AWS_SQS_NOTIFICATION_ARN)"
+	@cd terraform && terraform plan -out=tfplan -var "notification_queue_arn=$(AWS_SQS_NOTIFICATION_ARN)" -var "mailtrap_user=$(MAILTRAP_USER)" -var "mailtrap_pass=$(MAILTRAP_PASS)"
 
 .PHONY: tf-apply
 tf-apply: ## Apply Terraform from saved plan
@@ -34,10 +36,10 @@ tf-apply: ## Apply Terraform from saved plan
 tf-apply-direct: ## Apply Terraform directly (without plan file)
 	@echo  "🟢 Applying Terraform directly..."
 	@echo "Using AWS_SQS_NOTIFICATION_ARN: $(AWS_SQS_NOTIFICATION_ARN)"
-	@cd terraform && terraform apply -var "notification_queue_arn=$(AWS_SQS_NOTIFICATION_ARN)" -input=false -auto-approve
+	@cd terraform && terraform apply -var "notification_queue_arn=$(AWS_SQS_NOTIFICATION_ARN)" -var "mailtrap_user=$(MAILTRAP_USER)" -var "mailtrap_pass=$(MAILTRAP_PASS)" -input=false -auto-approve
 
 .PHONY: tf-destroy
 tf-destroy: ## Destroy Terraform resources
 	@echo  "🔴 Destroying Terraform resources..."
 	@echo "Using AWS_SQS_NOTIFICATION_ARN: $(AWS_SQS_NOTIFICATION_ARN)"
-	@cd terraform && terraform destroy -var "notification_queue_arn=$(AWS_SQS_NOTIFICATION_ARN)" -auto-approve
+	@cd terraform && terraform destroy -var "notification_queue_arn=$(AWS_SQS_NOTIFICATION_ARN)" -auto-approve -var "mailtrap_user=$(MAILTRAP_USER)" -var "mailtrap_pass=$(MAILTRAP_PASS)"
